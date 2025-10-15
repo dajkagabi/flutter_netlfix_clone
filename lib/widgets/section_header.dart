@@ -1,3 +1,4 @@
+// widgets/section_header.dart
 import 'package:flutter/material.dart';
 
 class SectionHeader extends StatelessWidget {
@@ -23,7 +24,10 @@ class SectionHeader extends StatelessWidget {
           ),
           TextButton(
             onPressed: onSeeAll,
-            child: const Text('Összes', style: TextStyle(color: Colors.grey)),
+            child: const Text(
+              'Összes',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),

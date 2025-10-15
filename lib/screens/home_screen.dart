@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_netlfix_clone/screens/movie_detail_screen.dart';
-import 'package:flutter_netlfix_clone/screens/search_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/movie_provider.dart';
 import '../widgets/movie_card.dart';
 import '../widgets/section_header.dart';
 import '../services/tmdb_service.dart';
 import '../models/movie.dart';
+import 'movie_detail_screen.dart';
+import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +16,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +25,21 @@ class _HomeScreenState extends State<HomeScreen> {
       final movieProvider = Provider.of<MovieProvider>(context, listen: false);
       movieProvider.loadAllMovies();
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _navigateToMovieDetail(Movie movie) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MovieDetailScreen(movieId: movie.id),
+      ),
+    );
   }
 
   @override
@@ -107,6 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           return SingleChildScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(),
+            //alsó padding
+            padding: const EdgeInsets.only(bottom: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -126,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
                 SectionHeader(title: 'Hamarosan', onSeeAll: () {}),
                 _buildFilmLista(movieProvider.upcomingMovies),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
               ],
             ),
           );
@@ -136,9 +157,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildKiemeltFilm(MovieProvider movieProvider) {
-    if (movieProvider.nowPlayingMovies.isEmpty) {
+    final nowPlayingMovies = movieProvider.nowPlayingMovies;
+    if (nowPlayingMovies.isEmpty) {
       return Container(
-        height: 500,
+        height: 450,
         color: Colors.grey[900],
         child: const Center(
           child: Column(
@@ -156,92 +178,99 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    final kiemeltFilm = movieProvider.nowPlayingMovies.first;
-    final backdropUrl = kiemeltFilm.backdropPath != null
+    final kiemeltFilm = nowPlayingMovies.first;
+    final backdropUrl =
+        kiemeltFilm.backdropPath != null && kiemeltFilm.backdropPath!.isNotEmpty
         ? TMDbService.getImageUrl(kiemeltFilm.backdropPath)
         : null;
 
-    return Container(
-      height: 500,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        image: backdropUrl != null
-            ? DecorationImage(
-                image: NetworkImage(backdropUrl),
-                fit: BoxFit.cover,
-              )
-            : null,
-      ),
+    return GestureDetector(
+      onTap: () => _navigateToMovieDetail(kiemeltFilm),
       child: Container(
+        height: 450,
+        width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [
-              Colors.black.withOpacity(0.9),
-              Colors.black.withOpacity(0.3),
-            ],
-          ),
+          color: Colors.grey[900],
+          image: backdropUrl != null
+              ? DecorationImage(
+                  image: NetworkImage(backdropUrl),
+                  fit: BoxFit.cover,
+                )
+              : null,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                kiemeltFilm.title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Colors.black.withOpacity(0.9),
+                Colors.black.withOpacity(0.3),
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  kiemeltFilm.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, bottom: 20.0),
-              child: Row(
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MovieDetailScreen(movieId: kiemeltFilm.id),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  bottom: 20.0,
+                  right: 16.0,
+                ),
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        _navigateToMovieDetail(kiemeltFilm);
+                      },
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('Lejátszás'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Lejátszás'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MovieDetailScreen(movieId: kiemeltFilm.id),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        _navigateToMovieDetail(kiemeltFilm);
+                      },
+                      icon: const Icon(Icons.info_outline),
+                      label: const Text('Részletek'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.info_outline),
-                    label: const Text('További információ'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Colors.white),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -250,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFilmLista(List<Movie> filmek) {
     if (filmek.isEmpty) {
       return const SizedBox(
-        height: 200,
+        height: 180,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -269,14 +298,19 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return SizedBox(
-      height: 220,
+      height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         itemCount: filmek.length,
         itemBuilder: (context, index) {
           final film = filmek[index];
-          return MovieCard(movie: film);
+          return MovieCard(
+            movie: film,
+            onTap: () => _navigateToMovieDetail(film),
+            width: 130,
+            height: 190,
+          );
         },
       ),
     );
