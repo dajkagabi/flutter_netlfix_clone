@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final movieProvider = Provider.of<MovieProvider>(context, listen: false);
-      movieProvider.loadAllMovies(); // ✅ CSAK EZT HIVD!
+      movieProvider.loadAllMovies();
     });
   }
 
@@ -81,36 +81,36 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🎬 FEATURED MOVIE SECTION
+                //  KIEMELT
                 _buildFeaturedMovie(movieProvider),
 
                 const SizedBox(height: 20),
 
-                // 🔥 TRENDING SECTION
+                //  TRENDI
                 SectionHeader(title: 'Trendi most', onSeeAll: () {}),
                 _buildMovieList(movieProvider.trendingMovies),
 
                 const SizedBox(height: 20),
 
-                // 📱 POPULAR MOVIES SECTION
+                //  NÉPSZERŰ
                 SectionHeader(title: 'Népszerű filmek', onSeeAll: () {}),
                 _buildMovieList(movieProvider.popularMovies),
 
                 const SizedBox(height: 20),
 
-                // ⭐ TOP RATED SECTION
+                //  LEGJOBBRA ÉRTÉKELT
                 SectionHeader(title: 'Legjobbra értékelt', onSeeAll: () {}),
                 _buildMovieList(movieProvider.topRatedMovies),
 
                 const SizedBox(height: 20),
 
-                // 🎪 NOW PLAYING SECTION
+                //  MOST A MOZIKBAN
                 SectionHeader(title: 'Most a mozikban', onSeeAll: () {}),
                 _buildMovieList(movieProvider.nowPlayingMovies),
 
                 const SizedBox(height: 20),
 
-                // 🗓️ UPCOMING SECTION
+                //  HAMAROSAN
                 SectionHeader(title: 'Hamarosan', onSeeAll: () {}),
                 _buildMovieList(movieProvider.upcomingMovies),
 

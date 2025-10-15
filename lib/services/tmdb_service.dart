@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_netlfix_clone/models/movie_detail.dart';
 import 'package:http/http.dart' as http;
 import '../models/movie.dart';
 
@@ -74,6 +75,26 @@ class TMDbService {
     } catch (e) {
       print('Network error: $e');
       return [];
+    }
+  }
+
+  // Movie részletek lekérése
+  Future<MovieDetail?> getMovieDetails(int movieId) async {
+    try {
+      final response = await _client.get(
+        Uri.parse('$_baseUrl/movie/$movieId?api_key=$_apiKey'),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return MovieDetail.fromJson(data);
+      } else {
+        print('API Error ${response.statusCode}: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Network error: $e');
+      return null;
     }
   }
 
