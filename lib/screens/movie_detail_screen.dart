@@ -30,7 +30,17 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Colors.red),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.red),
+                  SizedBox(height: 16),
+                  Text(
+                    'Film betöltése...',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
             );
           }
 
@@ -39,11 +49,22 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                  const SizedBox(height: 16),
                   const Text(
                     'Hiba a film betöltésében',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Text(
+                      'Nem sikerült betölteni a film adatait. Kérjük, próbáld újra később.',
+                      style: TextStyle(color: Colors.white70),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -52,17 +73,20 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         );
                       });
                     },
-                    child: const Text('Újrapróbál'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Újrapróbálás'),
                   ),
                 ],
               ),
             );
           }
 
-          final movie = snapshot.data!;
+          final film = snapshot.data!;
           return CustomScrollView(
             slivers: [
-              // FEJLÉC KÉP
               SliverAppBar(
                 expandedHeight: 400,
                 stretch: true,
@@ -71,12 +95,21 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      movie.backdropPath != null
+                      film.hasBackdrop
                           ? Image.network(
-                              TMDbService.getImageUrl(movie.backdropPath),
+                              TMDbService.getImageUrl(film.backdropPath),
                               fit: BoxFit.cover,
                             )
-                          : Container(color: Colors.grey[900]),
+                          : Container(
+                              color: Colors.grey[900],
+                              child: const Center(
+                                child: Icon(
+                                  Icons.movie_creation_outlined,
+                                  color: Colors.white54,
+                                  size: 80,
+                                ),
+                              ),
+                            ),
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -103,56 +136,55 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                       Icons.favorite_border,
                       color: Colors.white,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Kedvencek funkció hamarosan...'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
-
-              // FILM INFÓK
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // CÍM
                       Text(
-                        movie.title,
+                        film.title,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 16),
-
-                      // MŰFAJOK & INFÓK
-                      Row(
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
-                          if (movie.voteAverage != null) ...[
+                          if (film.hasRating)
                             _buildInfoChip(
-                              '⭐ ${movie.voteAverage!.toStringAsFixed(1)}',
+                              '⭐ ${film.voteAverage!.toStringAsFixed(1)}',
                             ),
-                            const SizedBox(width: 8),
-                          ],
-                          if (movie.releaseDate != null) ...[
-                            _buildInfoChip(movie.releaseDate!.substring(0, 4)),
-                            const SizedBox(width: 8),
-                          ],
-                          if (movie.runtime != null) ...[
-                            _buildInfoChip('${movie.runtime!} perc'),
-                          ],
+                          if (film.hasReleaseDate)
+                            _buildInfoChip(film.releaseDate!.substring(0, 4)),
+                          if (film.hasRuntime)
+                            _buildInfoChip('${film.runtime!} perc'),
+                          if (!film.hasRating &&
+                              !film.hasReleaseDate &&
+                              !film.hasRuntime)
+                            _buildInfoChip('Információ nem elérhető'),
                         ],
                       ),
-
                       const SizedBox(height: 16),
-
-                      // MŰFAJOK
-                      if (movie.genres != null && movie.genres!.isNotEmpty) ...[
+                      if (film.hasGenres) ...[
                         Wrap(
                           spacing: 8,
-                          children: movie.genres!
+                          children: film.genres!
                               .map(
                                 (genre) => Chip(
                                   label: Text(
@@ -166,12 +198,9 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         ),
                         const SizedBox(height: 16),
                       ],
-
-                      // TAGLINE
-                      if (movie.tagline != null &&
-                          movie.tagline!.isNotEmpty) ...[
+                      if (film.hasTagline) ...[
                         Text(
-                          '"${movie.tagline!}"',
+                          '"${film.tagline!}"',
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 16,
@@ -180,10 +209,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         ),
                         const SizedBox(height: 16),
                       ],
-
-                      // LEÍRÁS
-                      if (movie.overview != null &&
-                          movie.overview!.isNotEmpty) ...[
+                      if (film.hasOverview) ...[
                         const Text(
                           'Történet',
                           style: TextStyle(
@@ -194,14 +220,34 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          movie.overview!,
+                          film.overview!,
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 16,
                             height: 1.5,
                           ),
                         ),
+                      ] else ...[
+                        const Text(
+                          'Történet',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Ehhez a filmhez még nem készült leírás.',
+                          style: TextStyle(
+                            color: Colors.white54,
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
+                            height: 1.5,
+                          ),
+                        ),
                       ],
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
@@ -210,14 +256,11 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           );
         },
       ),
-
-      // PLAY GOMB
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Később trailer
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Trailer hamarosan...'),
+              content: Text('Trailer lejátszása hamarosan...'),
               backgroundColor: Colors.red,
             ),
           );
@@ -229,15 +272,15 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     );
   }
 
-  Widget _buildInfoChip(String text) {
+  Widget _buildInfoChip(String szoveg) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        text,
+        szoveg,
         style: const TextStyle(color: Colors.white, fontSize: 12),
       ),
     );

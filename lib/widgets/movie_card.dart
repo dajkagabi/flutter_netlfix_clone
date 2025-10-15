@@ -25,46 +25,29 @@ class MovieCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Film poszter
             Container(
               height: 160,
               width: 120,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.grey[800],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: movie.posterPath != null
-                    ? Image.network(
-                        TMDbService.getImageUrl(movie.posterPath!),
-                        fit: BoxFit.cover,
-                        width: 120,
-                        height: 160,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildPlaceholder();
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: Colors.grey[800],
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.red,
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : _buildPlaceholder(),
+                child: _buildPosterImage(),
               ),
             ),
             const SizedBox(height: 8),
 
-            // Film cím
             Text(
-              movie.title,
+              movie.title.isNotEmpty ? movie.title : 'Cím nem elérhető',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 12,
@@ -75,7 +58,6 @@ class MovieCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
 
-            // Értékelés
             if (movie.voteAverage != null && movie.voteAverage! > 0) ...[
               const SizedBox(height: 4),
               Row(
@@ -88,6 +70,12 @@ class MovieCard extends StatelessWidget {
                   ),
                 ],
               ),
+            ] else ...[
+              const SizedBox(height: 4),
+              const Text(
+                'Értékelés: N/A',
+                style: TextStyle(color: Colors.white54, fontSize: 10),
+              ),
             ],
           ],
         ),
@@ -95,11 +83,50 @@ class MovieCard extends StatelessWidget {
     );
   }
 
+  Widget _buildPosterImage() {
+    if (movie.posterPath == null || movie.posterPath!.isEmpty) {
+      return _buildPlaceholder();
+    }
+
+    return Image.network(
+      TMDbService.getImageUrl(movie.posterPath!),
+      fit: BoxFit.cover,
+      width: 120,
+      height: 160,
+      errorBuilder: (context, error, stackTrace) {
+        return _buildPlaceholder();
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: Colors.grey[800],
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.red, strokeWidth: 2),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildPlaceholder() {
     return Container(
       color: Colors.grey[800],
       child: const Center(
-        child: Icon(Icons.movie, color: Colors.white54, size: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.movie_creation_outlined,
+              color: Colors.white54,
+              size: 40,
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Nincs kép',
+              style: TextStyle(color: Colors.white54, fontSize: 10),
+            ),
+          ],
+        ),
       ),
     );
   }

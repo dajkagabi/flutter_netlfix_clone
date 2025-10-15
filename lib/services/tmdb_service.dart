@@ -7,16 +7,18 @@ class TMDbService {
   static const String _baseUrl = 'https://api.themoviedb.org/3';
   static const String _apiKey = 'bbc3e7667feec0318a7b4ab40b629cdc';
   static const String _imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
+  static const String _language = 'hu-HU';
 
   final http.Client _client;
 
   TMDbService({http.Client? client}) : _client = client ?? http.Client();
 
-  // NOW PLAYING filmek
   Future<List<Movie>> getNowPlayingMovies() async {
     try {
       final response = await _client.get(
-        Uri.parse('$_baseUrl/movie/now_playing?api_key=$_apiKey'),
+        Uri.parse(
+          '$_baseUrl/movie/now_playing?api_key=$_apiKey&language=$_language',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -31,25 +33,26 @@ class TMDbService {
               movies.add(movie);
             }
           } catch (e) {
-            print('Error parsing movie: $e');
+            print('Hiba a film feldolgozásában: $e');
           }
         }
         return movies;
       } else {
-        print('API Error ${response.statusCode}: ${response.body}');
+        print('API Hiba ${response.statusCode}: ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Network error: $e');
+      print('Hálózati hiba: $e');
       return [];
     }
   }
 
-  // POPULAR filmek
   Future<List<Movie>> getPopularMovies() async {
     try {
       final response = await _client.get(
-        Uri.parse('$_baseUrl/movie/popular?api_key=$_apiKey'),
+        Uri.parse(
+          '$_baseUrl/movie/popular?api_key=$_apiKey&language=$_language',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -64,45 +67,47 @@ class TMDbService {
               movies.add(movie);
             }
           } catch (e) {
-            print('Error parsing movie: $e');
+            print('Hiba a film feldolgozásában: $e');
           }
         }
         return movies;
       } else {
-        print('API Error ${response.statusCode}: ${response.body}');
+        print('API Hiba ${response.statusCode}: ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Network error: $e');
+      print('Hálózati hiba: $e');
       return [];
     }
   }
 
-  // Movie részletek lekérése
   Future<MovieDetail?> getMovieDetails(int movieId) async {
     try {
       final response = await _client.get(
-        Uri.parse('$_baseUrl/movie/$movieId?api_key=$_apiKey'),
+        Uri.parse(
+          '$_baseUrl/movie/$movieId?api_key=$_apiKey&language=$_language',
+        ),
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return MovieDetail.fromJson(data);
       } else {
-        print('API Error ${response.statusCode}: ${response.body}');
+        print('API Hiba ${response.statusCode}: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Network error: $e');
+      print('Hálózati hiba: $e');
       return null;
     }
   }
 
-  // TOP RATED filmek
   Future<List<Movie>> getTopRatedMovies() async {
     try {
       final response = await _client.get(
-        Uri.parse('$_baseUrl/movie/top_rated?api_key=$_apiKey'),
+        Uri.parse(
+          '$_baseUrl/movie/top_rated?api_key=$_apiKey&language=$_language',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -117,25 +122,26 @@ class TMDbService {
               movies.add(movie);
             }
           } catch (e) {
-            print('Error parsing movie: $e');
+            print('Hiba a film feldolgozásában: $e');
           }
         }
         return movies;
       } else {
-        print('API Error ${response.statusCode}: ${response.body}');
+        print('API Hiba ${response.statusCode}: ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Network error: $e');
+      print('Hálózati hiba: $e');
       return [];
     }
   }
 
-  // UPCOMING filmek
   Future<List<Movie>> getUpcomingMovies() async {
     try {
       final response = await _client.get(
-        Uri.parse('$_baseUrl/movie/upcoming?api_key=$_apiKey'),
+        Uri.parse(
+          '$_baseUrl/movie/upcoming?api_key=$_apiKey&language=$_language',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -150,25 +156,26 @@ class TMDbService {
               movies.add(movie);
             }
           } catch (e) {
-            print('Error parsing movie: $e');
+            print('Hiba a film feldolgozásában: $e');
           }
         }
         return movies;
       } else {
-        print('API Error ${response.statusCode}: ${response.body}');
+        print('API Hiba ${response.statusCode}: ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Network error: $e');
+      print('Hálózati hiba: $e');
       return [];
     }
   }
 
-  // TRENDING filmek (heti)
   Future<List<Movie>> getTrendingMovies() async {
     try {
       final response = await _client.get(
-        Uri.parse('$_baseUrl/trending/movie/week?api_key=$_apiKey'),
+        Uri.parse(
+          '$_baseUrl/trending/movie/week?api_key=$_apiKey&language=$_language',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -183,21 +190,20 @@ class TMDbService {
               movies.add(movie);
             }
           } catch (e) {
-            print('Error parsing movie: $e');
+            print('Hiba a film feldolgozásában: $e');
           }
         }
         return movies;
       } else {
-        print('API Error ${response.statusCode}: ${response.body}');
+        print('API Hiba ${response.statusCode}: ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Network error: $e');
+      print('Hálózati hiba: $e');
       return [];
     }
   }
 
-  // Kép URL előállítása
   static String getImageUrl(String? path) {
     return path != null ? '$_imageBaseUrl$path' : '';
   }

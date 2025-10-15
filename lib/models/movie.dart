@@ -1,4 +1,5 @@
-//
+//Film, osztály
+
 class Movie {
   final int id;
   final String title;

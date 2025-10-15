@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_netlfix_clone/screens/movie_detail_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/movie_provider.dart';
 import '../widgets/movie_card.dart';
@@ -51,14 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(color: Colors.white),
                   ),
                   content: const Text(
-                    'Keresés hamarosan...',
+                    'Keresés funkció hamarosan...',
                     style: TextStyle(color: Colors.white),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: const Text(
-                        'OK',
+                        'RENDBEN',
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
@@ -73,7 +74,53 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, movieProvider, child) {
           if (movieProvider.isLoading && movieProvider.popularMovies.isEmpty) {
             return const Center(
-              child: CircularProgressIndicator(color: Colors.red),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.red),
+                  SizedBox(height: 16),
+                  Text(
+                    'Filmek betöltése...',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (movieProvider.error != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Hiba történt',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Text(
+                      movieProvider.error!,
+                      style: const TextStyle(color: Colors.white70),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      movieProvider.loadAllMovies();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Újrapróbálás'),
+                  ),
+                ],
+              ),
             );
           }
 
@@ -81,39 +128,22 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                //  KIEMELT
-                _buildFeaturedMovie(movieProvider),
-
+                _buildKiemeltFilm(movieProvider),
                 const SizedBox(height: 20),
-
-                //  TRENDI
                 SectionHeader(title: 'Trendi most', onSeeAll: () {}),
-                _buildMovieList(movieProvider.trendingMovies),
-
+                _buildFilmLista(movieProvider.trendingMovies),
                 const SizedBox(height: 20),
-
-                //  NÉPSZERŰ
                 SectionHeader(title: 'Népszerű filmek', onSeeAll: () {}),
-                _buildMovieList(movieProvider.popularMovies),
-
+                _buildFilmLista(movieProvider.popularMovies),
                 const SizedBox(height: 20),
-
-                //  LEGJOBBRA ÉRTÉKELT
                 SectionHeader(title: 'Legjobbra értékelt', onSeeAll: () {}),
-                _buildMovieList(movieProvider.topRatedMovies),
-
+                _buildFilmLista(movieProvider.topRatedMovies),
                 const SizedBox(height: 20),
-
-                //  MOST A MOZIKBAN
                 SectionHeader(title: 'Most a mozikban', onSeeAll: () {}),
-                _buildMovieList(movieProvider.nowPlayingMovies),
-
+                _buildFilmLista(movieProvider.nowPlayingMovies),
                 const SizedBox(height: 20),
-
-                //  HAMAROSAN
                 SectionHeader(title: 'Hamarosan', onSeeAll: () {}),
-                _buildMovieList(movieProvider.upcomingMovies),
-
+                _buildFilmLista(movieProvider.upcomingMovies),
                 const SizedBox(height: 20),
               ],
             ),
@@ -123,23 +153,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFeaturedMovie(MovieProvider movieProvider) {
+  Widget _buildKiemeltFilm(MovieProvider movieProvider) {
     if (movieProvider.nowPlayingMovies.isEmpty) {
       return Container(
         height: 500,
         color: Colors.grey[900],
         child: const Center(
-          child: Text(
-            'Nincs kiemelt film',
-            style: TextStyle(color: Colors.white),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.movie_outlined, color: Colors.white54, size: 64),
+              SizedBox(height: 16),
+              Text(
+                'Nincs kiemelt film',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ],
           ),
         ),
       );
     }
 
-    final featuredMovie = movieProvider.nowPlayingMovies.first;
-    final backdropUrl = featuredMovie.backdropPath != null
-        ? TMDbService.getImageUrl(featuredMovie.backdropPath)
+    final kiemeltFilm = movieProvider.nowPlayingMovies.first;
+    final backdropUrl = kiemeltFilm.backdropPath != null
+        ? TMDbService.getImageUrl(kiemeltFilm.backdropPath)
         : null;
 
     return Container(
@@ -172,12 +209,54 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                featuredMovie.title,
+                kiemeltFilm.title,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, bottom: 20.0),
+              child: Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MovieDetailScreen(movieId: kiemeltFilm.id),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Lejátszás'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MovieDetailScreen(movieId: kiemeltFilm.id),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.info_outline),
+                    label: const Text('További információ'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -186,28 +265,36 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMovieList(List<Movie> movies) {
-    if (movies.isEmpty) {
+  Widget _buildFilmLista(List<Movie> filmek) {
+    if (filmek.isEmpty) {
       return const SizedBox(
         height: 200,
         child: Center(
-          child: Text(
-            'Nincsenek filmek',
-            style: TextStyle(color: Colors.white),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.movie_creation_outlined,
+                color: Colors.white54,
+                size: 48,
+              ),
+              SizedBox(height: 8),
+              Text('Nincsenek filmek', style: TextStyle(color: Colors.white70)),
+            ],
           ),
         ),
       );
     }
 
     return SizedBox(
-      height: 200,
+      height: 220,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        itemCount: movies.length,
+        itemCount: filmek.length,
         itemBuilder: (context, index) {
-          final movie = movies[index];
-          return MovieCard(movie: movie);
+          final film = filmek[index];
+          return MovieCard(movie: film);
         },
       ),
     );
