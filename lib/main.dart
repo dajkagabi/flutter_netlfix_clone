@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_netlfix_clone/providers/movie_provider.dart';
+import 'providers/movie_provider.dart';
+import 'providers/search_provider.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -13,7 +14,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => MovieProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => MovieProvider()),
+        ChangeNotifierProvider(
+          create: (_) => SearchProvider(),
+        ), // ✅ ÚJ PROVIDER
+      ],
       child: MaterialApp(
         title: 'Netflix Clone',
         theme: ThemeData(

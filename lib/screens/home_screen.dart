@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_netlfix_clone/screens/movie_detail_screen.dart';
+import 'package:flutter_netlfix_clone/screens/search_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/movie_provider.dart';
 import '../widgets/movie_card.dart';
@@ -43,28 +44,9 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  backgroundColor: Colors.grey[900],
-                  title: const Text(
-                    'Keresés',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  content: const Text(
-                    'Keresés funkció hamarosan...',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        'RENDBEN',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
-                ),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
               );
             },
           ),

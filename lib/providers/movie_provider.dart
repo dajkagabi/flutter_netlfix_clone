@@ -46,31 +46,31 @@ class MovieProvider with ChangeNotifier {
     }
   }
 
-  // Popular filmek betöltése
+  // Popular
   Future<void> loadPopularMovies() async {
     _popularMovies = await _tmdbService.getPopularMovies();
     notifyListeners();
   }
 
-  // Now playing filmek betöltése
+  // Now playing
   Future<void> loadNowPlayingMovies() async {
     _nowPlayingMovies = await _tmdbService.getNowPlayingMovies();
     notifyListeners();
   }
 
-  // Top rated filmek betöltése
+  // Top rated
   Future<void> loadTopRatedMovies() async {
     _topRatedMovies = await _tmdbService.getTopRatedMovies();
     notifyListeners();
   }
 
-  // Upcoming filmek betöltése
+  // Upcoming
   Future<void> loadUpcomingMovies() async {
     _upcomingMovies = await _tmdbService.getUpcomingMovies();
     notifyListeners();
   }
 
-  // Trending filmek betöltése
+  // Trending
   Future<void> loadTrendingMovies() async {
     _trendingMovies = await _tmdbService.getTrendingMovies();
     notifyListeners();
