@@ -15,7 +15,7 @@ class MovieCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Film poszter - JAVÍTVA
+          // Film poszter
           Container(
             height: 160,
             width: 120,
@@ -49,7 +49,7 @@ class MovieCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // Film cím - JAVÍTVA
+          // Film cím
           Text(
             movie.title,
             style: const TextStyle(
@@ -62,7 +62,7 @@ class MovieCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
 
-          // Értékelés - JAVÍTVA
+          // Értékelés
           if (movie.voteAverage != null && movie.voteAverage! > 0) ...[
             const SizedBox(height: 4),
             Row(
