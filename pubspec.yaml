@@ -44,7 +44,7 @@ dependencies:
   like_button: ^2.1.0
   infinite_carousel: ^1.1.1
   percent_indicator: ^4.2.5
-  flutter_riverpod: ^3.0.3
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -53,9 +53,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.9.0
-  json_annotation: ^4.9.0
-  json_serializer: ^0.2.0
+  
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
