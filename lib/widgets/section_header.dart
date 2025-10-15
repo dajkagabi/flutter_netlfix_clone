@@ -1,11 +1,17 @@
-// widgets/section_header.dart
 import 'package:flutter/material.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
   final VoidCallback onSeeAll;
+  final bool showSeeAll;
 
-  const SectionHeader({super.key, required this.title, required this.onSeeAll});
+  const SectionHeader({
+    super.key,
+    required this.title,
+    required this.onSeeAll,
+    // Alapértelmezetten mutatjuk az "Összes" gombot
+    this.showSeeAll = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +28,17 @@ class SectionHeader extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          TextButton(
-            onPressed: onSeeAll,
-            child: const Text(
-              'Összes',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+          if (showSeeAll)
+            TextButton(
+              onPressed: onSeeAll,
+              child: const Text(
+                'Összes',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
