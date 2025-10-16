@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'screens/main_screen.dart';
 import 'providers/movie_provider.dart';
-import 'providers/search_provider.dart';
-import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => MovieProvider())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,27 +17,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => MovieProvider()),
-        ChangeNotifierProvider(
-          create: (_) => SearchProvider(),
-        ), // ✅ ÚJ PROVIDER
-      ],
-      child: MaterialApp(
-        title: 'Netflix Clone',
-        theme: ThemeData(
-          primarySwatch: Colors.red,
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: Colors.black,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
+    return MaterialApp(
+      title: 'Netflix Clone',
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          elevation: 0,
         ),
-        home: const HomeScreen(),
-        debugShowCheckedModeBanner: false,
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.black,
+        ),
       ),
+      //  MainScreen a kezdőképernyő lett a HomeScreen helyett.
+      home: const MainScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

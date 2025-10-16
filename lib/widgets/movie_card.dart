@@ -10,13 +10,13 @@ class MovieCard extends StatelessWidget {
   final double height;
 
   const MovieCard({
-    Key? key,
+    super.key,
     required this.movie,
     required this.onTap,
     //Méretek, rácsok
     this.width = 130,
     this.height = 190,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class MovieCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // KÉP RESZORT
+            // KÉP
             _buildMoviePoster(),
             const SizedBox(height: 6),
             // CÍM ÉS INFÓ
@@ -43,7 +43,7 @@ class MovieCard extends StatelessWidget {
   Widget _buildMoviePoster() {
     return Container(
       width: width,
-      height: height - 50, // LEVONVA AZ INFO RÉSZ MAGASSÁGÁT
+      height: height - 50,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
@@ -60,7 +60,7 @@ class MovieCard extends StatelessWidget {
           children: [
             // HÁTTÉRKÉP
             _buildPosterImage(),
-            // ÁTTETSŐ ÁRNYEÉK A ALJÁRA
+
             _buildImageOverlay(),
             // ÉRTÉKELÉS
             if (movie.hasRating) _buildRatingBadge(),

@@ -6,7 +6,6 @@ import '../widgets/section_header.dart';
 import '../services/tmdb_service.dart';
 import '../models/movie.dart';
 import 'movie_detail_screen.dart';
-import 'search_screen.dart';
 import 'movie_grid_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,7 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Takarítás: scroll controller felszabadítása
+    // Takarítás: scroll controller felszabadítás
+    /*Megakadályozza a memóriaszivárgást
+     Leállítja az eseményfigyelőket
+    Felszabadítja a rendszererőforrásokat  */
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -60,33 +63,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        title: const Text(
-          'NETFLIX',
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          // Keresés ikon a jobb felső sarokban
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SearchScreen()),
-              );
-            },
-          ),
-        ],
-      ),
+      // Most már a MAINCREEN kezeli
       body: Consumer<MovieProvider>(
         builder: (context, movieProvider, child) {
-          // Betöltés állapot: mutatjuk a betöltő képernyőt
+          // Betöltés állapot
           if (movieProvider.isLoading && movieProvider.popularMovies.isEmpty) {
             return const Center(
               child: Column(
@@ -103,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
-          // Hiba állapot: hibaüzenet megjelenítése
+          //Hibaüzenet megjelenítése
           if (movieProvider.error != null) {
             return Center(
               child: Column(
@@ -141,10 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
-          // Normál állapot: filmek megjelenítése
+          //Filmek megjelenítése
           return SingleChildScrollView(
             controller: _scrollController,
-            physics: const BouncingScrollPhysics(), // Rugalmas görgetés
+            // Rugalmas görgetés
+            physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.only(bottom: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildKiemeltFilm(movieProvider),
                 const SizedBox(height: 20),
 
-                // Trendi filmek szekció
+                // Trendi filmek
                 SectionHeader(
                   title: 'Trendi most',
                   onSeeAll: () => _navigateToCategory(
@@ -164,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildFilmLista(movieProvider.trendingMovies),
                 const SizedBox(height: 20),
 
-                // Népszerű filmek szekció
+                // Népszerű filmek
                 SectionHeader(
                   title: 'Népszerű filmek',
                   onSeeAll: () => _navigateToCategory(
@@ -175,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildFilmLista(movieProvider.popularMovies),
                 const SizedBox(height: 20),
 
-                // Legjobbra értékelt filmek szekció
+                // Legjobbra értékelt filmek
                 SectionHeader(
                   title: 'Legjobbra értékelt',
                   onSeeAll: () => _navigateToCategory(
@@ -186,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildFilmLista(movieProvider.topRatedMovies),
                 const SizedBox(height: 20),
 
-                // Most a mozikban szekció
+                // Most a mozikban
                 SectionHeader(
                   title: 'Most a mozikban',
                   onSeeAll: () => _navigateToCategory(
@@ -197,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildFilmLista(movieProvider.nowPlayingMovies),
                 const SizedBox(height: 20),
 
-                // Hamarosan érkező filmek szekció
+                // Hamarosan érkező filmek
                 SectionHeader(
                   title: 'Hamarosan',
                   onSeeAll: () => _navigateToCategory(
@@ -288,10 +269,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                   maxLines: 2,
-                  overflow: TextOverflow.ellipsis, // ha túl hosszú
+                  //ha túl hosszú lenne a
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              // Gombok a film műveleteihez
+
               Padding(
                 padding: const EdgeInsets.only(
                   left: 16.0,
@@ -346,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Vízszintes film lista egy szekcióhoz
+  // Vízszintes film lista
   Widget _buildFilmLista(List<Movie> filmek) {
     // Ha nincsenek filmek, placeholder-t jelenítünk meg
     if (filmek.isEmpty) {
@@ -369,11 +351,11 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    // Vízszintes görgethető lista a filmekről
+    // Vízszintes görgethető lista
     return SizedBox(
       height: 200,
       child: ListView.builder(
-        scrollDirection: Axis.horizontal, // Vízszintes görgetés
+        scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         itemCount: filmek.length,
         itemBuilder: (context, index) {
