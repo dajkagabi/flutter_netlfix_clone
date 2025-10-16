@@ -1,4 +1,3 @@
-//Filmek
 class Movie {
   final int id;
   final String title;
@@ -38,6 +37,21 @@ class Movie {
     );
   }
 
+  //  JSON konvertálás a mentéshez
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'overview': overview,
+      'poster_path': posterPath,
+      'backdrop_path': backdropPath,
+      'vote_average': voteAverage,
+      'vote_count': voteCount,
+      'release_date': releaseDate,
+      'genres': genres?.map((g) => g.toJson()).toList(),
+    };
+  }
+
   bool get hasPoster => posterPath != null && posterPath!.isNotEmpty;
   bool get hasBackdrop => backdropPath != null && backdropPath!.isNotEmpty;
   bool get hasRating => voteAverage != null && voteAverage! > 0;
@@ -52,5 +66,10 @@ class Genre {
 
   factory Genre.fromJson(Map<String, dynamic> json) {
     return Genre(id: json['id'], name: json['name']);
+  }
+
+  //  JSON konvertálás a mentéshez
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name};
   }
 }

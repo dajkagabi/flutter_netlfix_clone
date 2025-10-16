@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/main_screen.dart';
 import 'providers/movie_provider.dart';
+import 'providers/favorites_provider.dart';
 
 void main() {
   runApp(
+    //Providerek
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => MovieProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => MovieProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -30,7 +35,6 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.black,
         ),
       ),
-      //  MainScreen a kezdőképernyő lett a HomeScreen helyett.
       home: const MainScreen(),
       debugShowCheckedModeBanner: false,
     );

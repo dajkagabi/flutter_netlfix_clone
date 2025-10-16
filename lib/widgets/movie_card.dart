@@ -1,21 +1,24 @@
-// widgets/movie_card.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/movie.dart';
 import '../services/tmdb_service.dart';
+import '../providers/favorites_provider.dart';
 
 class MovieCard extends StatelessWidget {
   final Movie movie;
   final VoidCallback onTap;
   final double width;
   final double height;
+  final bool showFavoriteIcon;
 
   const MovieCard({
     super.key,
     required this.movie,
     required this.onTap,
-    //Méretek, rácsok
+    //Méretek
     this.width = 130,
     this.height = 190,
+    this.showFavoriteIcon = true,
   });
 
   @override
@@ -29,10 +32,8 @@ class MovieCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // KÉP
-            _buildMoviePoster(),
+            _buildMoviePoster(context),
             const SizedBox(height: 6),
-            // CÍM ÉS INFÓ
             _buildMovieInfo(),
           ],
         ),
@@ -40,7 +41,7 @@ class MovieCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMoviePoster() {
+  Widget _buildMoviePoster(BuildContext context) {
     return Container(
       width: width,
       height: height - 50,
@@ -58,18 +59,46 @@ class MovieCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         child: Stack(
           children: [
-            // HÁTTÉRKÉP
             _buildPosterImage(),
-
             _buildImageOverlay(),
-            // ÉRTÉKELÉS
             if (movie.hasRating) _buildRatingBadge(),
+            if (showFavoriteIcon) _buildFavoriteIcon(context),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildFavoriteIcon(BuildContext context) {
+    return Positioned(
+      top: 6,
+      left: 6,
+      child: Consumer<FavoritesProvider>(
+        builder: (context, favoritesProvider, child) {
+          final isFavorite = favoritesProvider.isFavorite(movie);
+          return GestureDetector(
+            onTap: () {
+              favoritesProvider.toggleFavorite(movie);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: isFavorite ? Colors.red : Colors.white,
+                size: 16,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  //
   Widget _buildPosterImage() {
     if (!movie.hasPoster) {
       return _buildPlaceholder();
@@ -118,7 +147,6 @@ class MovieCard extends StatelessWidget {
       left: 0,
       right: 0,
       child: Container(
-        //overlay átszabása
         height: 30,
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -167,7 +195,6 @@ class MovieCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // CÍM
           Text(
             movie.title,
             style: const TextStyle(
@@ -180,26 +207,18 @@ class MovieCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
-          // ÉV ÉS MŐFAJ
-          _buildMovieMeta(),
+          if (movie.releaseDate != null && movie.releaseDate!.isNotEmpty)
+            Text(
+              movie.releaseDate!.length >= 4
+                  ? movie.releaseDate!.substring(0, 4)
+                  : movie.releaseDate!,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 9,
+              ),
+            ),
         ],
       ),
-    );
-  }
-
-  Widget _buildMovieMeta() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // ÉV
-        if (movie.releaseDate != null && movie.releaseDate!.isNotEmpty)
-          Text(
-            movie.releaseDate!.length >= 4
-                ? movie.releaseDate!.substring(0, 4)
-                : movie.releaseDate!,
-            style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 9),
-          ),
-      ],
     );
   }
 }
