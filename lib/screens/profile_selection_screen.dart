@@ -40,7 +40,7 @@ class _ProfileSelectionScreenState extends State<ProfileSelectionScreen> {
 
   void _selectProfile(Profile profile) {
     if (profile.name == 'Új profil') {
-      _navigateToMainScreen(profile);
+      _showNewProfileScreen();
     } else if (profile.name == 'Gyerek') {
       _showKidsProfileDialog(profile);
     } else {
@@ -80,6 +80,22 @@ class _ProfileSelectionScreenState extends State<ProfileSelectionScreen> {
     );
   }
 
+  // Új profil
+  void _showNewProfileScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NewProfileScreen(
+          onSave: (newProfile) {
+            setState(() {
+              _profiles.insert(_profiles.length - 1, newProfile);
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,9 +104,7 @@ class _ProfileSelectionScreenState extends State<ProfileSelectionScreen> {
         child: Column(
           children: [
             _buildHeader(),
-
             Expanded(child: _buildProfileGrid()),
-
             _buildFooter(),
           ],
         ),
@@ -120,10 +134,10 @@ class _ProfileSelectionScreenState extends State<ProfileSelectionScreen> {
   Widget _buildProfileGrid() {
     return GridView.builder(
       padding: const EdgeInsets.all(20),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 20,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 200,
         mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
         childAspectRatio: 0.8,
       ),
       itemCount: _profiles.length,
@@ -139,13 +153,12 @@ class _ProfileSelectionScreenState extends State<ProfileSelectionScreen> {
       onTap: () => _selectProfile(profile),
       child: Column(
         children: [
-          // Profil ikon - Flutter ikonnal
           Container(
             width: 120,
             height: 120,
             decoration: BoxDecoration(
               color: profile.color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(60), // Kör alakú
+              borderRadius: BorderRadius.circular(60),
               border: Border.all(color: profile.color, width: 2),
             ),
             child: Center(
@@ -153,7 +166,6 @@ class _ProfileSelectionScreenState extends State<ProfileSelectionScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          // Profil név
           Text(
             profile.name,
             style: const TextStyle(
@@ -172,7 +184,6 @@ class _ProfileSelectionScreenState extends State<ProfileSelectionScreen> {
       padding: const EdgeInsets.all(20.0),
       child: Column(
         children: [
-          // Profil kezelése gomb
           OutlinedButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -190,6 +201,142 @@ class _ProfileSelectionScreenState extends State<ProfileSelectionScreen> {
             child: const Text('Profil kezelése'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+//  Új profil
+class NewProfileScreen extends StatefulWidget {
+  final Function(Profile) onSave;
+
+  const NewProfileScreen({super.key, required this.onSave});
+
+  @override
+  State<NewProfileScreen> createState() => _NewProfileScreenState();
+}
+
+class _NewProfileScreenState extends State<NewProfileScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  bool _isAdult = true;
+  Color _selectedColor = Colors.blueGrey.shade400;
+
+  final List<Color> _colors = [
+    Colors.blue.shade400,
+    Colors.green.shade400,
+    Colors.orange.shade400,
+    Colors.purple.shade400,
+    Colors.red.shade400,
+    Colors.yellow.shade400,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text('Új profil', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Avatar
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: _selectedColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(60),
+                border: Border.all(color: _selectedColor, width: 2),
+              ),
+              child: const Center(
+                child: Icon(
+                  AppIcons.adultProfile,
+                  color: Colors.white,
+                  size: 48,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Név mező
+            TextField(
+              controller: _nameController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Profil név',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white70),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Felnőtt/Gyerek váltó
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Felnőtt', style: TextStyle(color: Colors.white70)),
+                Switch(
+                  value: _isAdult,
+                  onChanged: (val) => setState(() => _isAdult = val),
+                  activeColor: Colors.red,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            // Színválasztó
+            Wrap(
+              spacing: 10,
+              children: _colors.map((color) {
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedColor = color),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      border: _selectedColor == color
+                          ? Border.all(color: Colors.white, width: 3)
+                          : null,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: () {
+                final newProfile = Profile(
+                  name: _nameController.text.isEmpty
+                      ? 'Új profil'
+                      : _nameController.text,
+                  icon: AppIcons.adultProfile,
+                  isAdult: _isAdult,
+                  color: _selectedColor,
+                );
+                widget.onSave(newProfile);
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 12,
+                ),
+              ),
+              child: const Text(
+                'Mentés',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
