@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/main_screen.dart';
+import 'screens/splash_screen.dart';
 import 'providers/movie_provider.dart';
 import 'providers/favorites_provider.dart';
 
 void main() {
   runApp(
-    //Providerek
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => MovieProvider()),
@@ -35,7 +34,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.black,
         ),
       ),
-      home: const MainScreen(),
+      home: SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
