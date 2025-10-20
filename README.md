@@ -2,6 +2,8 @@
 
 Ez a projekt egy Flutter alapú Netflix klón alkalmazás. Célja, hogy bemutassa a Flutter keretrendszer képességeit egy streaming alkalmazás felületének megvalósítására.
 
+A projekt PUBLIC APIT használ.
+
 ## Telepítés
 
 ### Előfeltételek
