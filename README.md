@@ -5,7 +5,7 @@ Ez a projekt egy Flutter alapú Netflix klón alkalmazás. Célja, hogy bemutass
 ## Telepítés
 
 ### Előfeltételek
-- [Flutter SDK](https://docs.flutter.dev/get-started/install)
+- Flutter SDK
 - Android Studio vagy VS Code
 - Emulator vagy fizikai eszköz
 
@@ -21,43 +21,33 @@ Ez a projekt egy Flutter alapú Netflix klón alkalmazás. Célja, hogy bemutass
 
 # ✨ Főbb funkciók:
 
-🎭 Profil Rendszer:
+## Profil Rendszer:
 
-✅ Több felhasználói profil - Akár 5 különböző profil
-
-✅ Profil testreszabás - Egyedi név, avatar, 
-
-✅ Gyerek profilok - Korhatáros tartalom szűrése
-
-✅ Profil váltás - Azonnali váltás profilközött
+-  Több felhasználói profil - Akár 5 különböző profil
+-  Profil testreszabás - Egyedi név, avatar, 
+-  Gyerek profilok - Korhatáros tartalom szűrése
+-  Profil váltás - Azonnali váltás profilközött
 
 
 
-# 🎬 Tartalom Böngészés:
+## Tartalom Böngészés:
 
-🏠 Főoldal - Személyre szabott ajánlások
-
-📺 Sorozatok - Élőző sorozatok és új részek
-
-🎞️ Filmek - Legfrissebb filmek és klasszikusok
-
-🔥 Népszerű - Trendben lévő tartalmak
-
-🆕 Új feltöltések - Frissen hozzáadott tartalmak
+- Főoldal - Személyre szabott ajánlások
+-  Sorozatok - Élőző sorozatok és új részek
+-  Filmek - Legfrissebb filmek és klasszikusok
+-  Népszerű - Trendben lévő tartalmak
+-  Új feltöltések - Frissen hozzáadott tartalmak
 
 
 
-# 🔍 Keresés és Felfedezés:
+## Keresés és Felfedezés:
 
-⚡ Gyorskeresés - Valós idejű keresési javaslatok
+-  Gyorskeresés - Valós idejű keresési javaslatok
+-  Kategóriák szerint - Műfajok, évszak, nyelv
+-  Megnéztem - Követés mely tartalmakat nézted meg
+-  Kedvencek - Mentés későbbi megtekintésre
 
-🏷️ Kategóriák szerint - Műfajok, évszak, nyelv
-
-👁️ Megnéztem - Követés mely tartalmakat nézted meg
-
-❤️ Kedvencek - Mentés későbbi megtekintésre
-
-# Fő Technológiák:
+## Fő Technológiák:
 
 - Flutter 3.13+ - Cross-platform keretrendszer
 - Dart 3.1+ - Modern programozási nyelv
@@ -66,13 +56,12 @@ Ez a projekt egy Flutter alapú Netflix klón alkalmazás. Célja, hogy bemutass
 - Android: 8.0+ (API 26+)
 - iOS: 12.0+
 
-
-
-# TMDB API Integration: 
+## TMDB API Integration: 
 - The Movie Database (TMDB) - Ingyenes film/sorozat adatbázis
 - Valós tartalom - Friss filmek és sorozatok
 - Magas felbontású képek - Poster-ek és backdrop-ok
 - Részletes metaadatok - Színészek, értékelések, leírások
+
 
 <img width="332" height="773" alt="Home" src="https://github.com/user-attachments/assets/30bb1455-916d-45bb-9a5c-feea68305c18" />
 <img width="332" height="773" alt="Search" src="https://github.com/user-attachments/assets/6e01dd87-da07-4c5d-8570-08d6c492b2ac" />
